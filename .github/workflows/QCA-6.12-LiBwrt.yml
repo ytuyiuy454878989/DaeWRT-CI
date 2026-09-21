@@ -1,6 +1,10 @@
 #CI项目
 name: QCA-6.12-LiBwrt
 
+#CI权限
+permissions:
+  contents: write
+  actions: write
 #CI计划
 on:
   #自动编译：当Auto-Clean运行完成后
@@ -12,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       PACKAGE:
-        description: '手动调整插件包，多个请用\n符号隔开。'
+        description: '手动调整插件包，多个请用\n符号隔开。删除包格式：-包名'
         required: false
         type: string
       TEST:
@@ -20,10 +24,13 @@ on:
         default: 'false'
         required: false
         type: boolean
-
+      VERBOSE:
+        description: '开启完整调试输出V=s(定位报错用，成功后关闭)'
+        default: false
+        required: false
+        type: boolean
 #CI权限
 permissions: write-all
-
 #CI任务
 jobs:
   config:
@@ -36,7 +43,6 @@ jobs:
         SOURCE: [LiBwrt/openwrt-6.x]
 #        SOURCE: [davidtall/LiBwrt-openwrt-6.x]
         BRANCH: [25.12-nss]
-
     #调用公用编译核心WRT-CORE.yml
     uses: ./.github/workflows/WRT-CORE.yml
     with:
@@ -64,5 +70,6 @@ jobs:
       WRT_PACKAGE: ${{inputs.PACKAGE}}
       #仅输出配置文件
       WRT_TEST: ${{inputs.TEST}}
-
       CI_NAME: ${{github.workflow}}
+      #调试开关，从手动输入获取
+      WRT_VERBOSE: ${{inputs.VERBOSE}}
